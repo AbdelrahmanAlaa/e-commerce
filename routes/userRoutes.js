@@ -16,6 +16,11 @@ router
 .route('/forgetPassword')
 .post(authUsers.forgetPassword) 
 
+router
+.route('/restPassword/:token')
+.post(authUsers.restPassword) 
+
+
 
 
 module.exports = router ; 

@@ -72,6 +72,15 @@ exports.validateLogin = (user)=>{
     return Joi.validate(user, schema);
 }
 
+exports.validateRestPassword = (user)=> {
+    const schema = {
+         password: Joi.string().min(5).max(255).required() , 
+         confirmPassword:Joi.string().min(8).max(255).required().equal(user.password)
+        };
+
+    return Joi.validate(user, schema);
+} 
+
 exports.creatRandomPassword = function(){
     const restToken = crypto.randomBytes(3).toString('hex');
     

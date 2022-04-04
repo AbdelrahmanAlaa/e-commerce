@@ -1,21 +1,21 @@
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
-const { User, validateUser,validateLogin,creatRandomPassword} = require('../models/userModel');
+const { User, validateUser,validateLogin,creatRandomPassword,validateRestPassword} = require('../models/userModel');
 const asyncError=require('../middleware/asyncError');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('./../middleware/email');
+const crypto = require('crypto')
 
 exports.register = asyncError(async (req, res,next) => {
-  
-    const { error } = validateUser(req.body);
-    if (error) return res.status(400).json({
+    const {error} = validateLogin(req.body);
+    if (error)return res.status(400).json({
         status :"false",
-        message :error.details[0].message});
+        message :"error.details[0].message"
+    });
     
-   
     let user = await User.findOne({ email: req.body.email });
     if (user) return res.status(400).json({
-           status:"failed",
+           status:"false",
             message :'That user already register!'});
             
      user = new User(req.body);
@@ -37,9 +37,10 @@ exports.register = asyncError(async (req, res,next) => {
 exports.login = asyncError(async(req,res)=>{
 
     const {error} = validateLogin(req.body);
-    if (error) return res.status(400).json({
+    if (error)return res.status(400).json({
         status :"false",
-        message :error.details[0].message});
+        message :"error.details[0].message"
+    });
     
         let user = await User.findOne({email:req.body.email});
         if(!user)return res.status(404).json({
@@ -105,6 +106,37 @@ exports.forgetPassword = asyncError(async(req,res)=>{
 });
 
 exports.restPassword = asyncError(async(req,res)=>{
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex') ;
+
+    const user = await User.findOne({
+        passwordRestToken :hashedToken,
+        passwordRestExpire:{$gt:DataTransfer.now()}
+    });
+    if(!user)return res.status(400).json('Token is invalid or expired ..');
+
+     
+    const {error}=validateRestPassword(req.body)
+    if(error)return res.status(404).json({
+        status:'failed',
+        message:error.details[0].message
+    })
+
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(req.body.password, salt);
+    
+
+         user.confirmPassword=undefined;
+        user.passwordRestToken =undefined;
+        user.passwordExpires =undefined;
+
+        await user.save();
+        res.status(200).json({
+        status:'success',
+        message: "successfully rest password",
+        user
+    })
+    
+
 })
 
 
