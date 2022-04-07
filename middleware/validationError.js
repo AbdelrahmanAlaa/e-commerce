@@ -1,12 +1,13 @@
-// const {validateUser}=require('./../models/userModel.js')
-// const asyncError = require('./asyncError');
+const {validateUser}=require('./../models/userModel.js')
+const asyncError = require('./asyncError');
 
 
-// exports.validateMessage = async(res,req)=>{
+exports.validateMessage =asyncError( async(req,res)=>{
 
-//     const { error } = validateUser(req.body);
-//     if (error) console.log("lfjrlk")
-    
-
-// }
+    const {error} = validateUser(req);
+    if (error) return ({
+        status:'false',
+        message:error.details[0].message
+    })
+})
 

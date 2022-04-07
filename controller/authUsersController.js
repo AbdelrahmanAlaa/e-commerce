@@ -10,8 +10,9 @@ exports.register = asyncError(async (req, res,next) => {
     const {error} = validateLogin(req.body);
     if (error)return res.status(400).json({
         status :"false",
-        message :"error.details[0].message"
+        message :error.details[0].message
     });
+    
     
     let user = await User.findOne({ email: req.body.email });
     if (user) return res.status(400).json({
@@ -39,7 +40,7 @@ exports.login = asyncError(async(req,res)=>{
     const {error} = validateLogin(req.body);
     if (error)return res.status(400).json({
         status :"false",
-        message :"error.details[0].message"
+        message :error.details[0].message
     });
     
         let user = await User.findOne({email:req.body.email});
@@ -110,7 +111,7 @@ exports.restPassword = asyncError(async(req,res)=>{
 
     const user = await User.findOne({
         passwordRestToken :hashedToken,
-        passwordRestExpire:{$gt:DataTransfer.now()}
+        passwordRestExpire:{$gt:Date.now()}
     });
     if(!user)return res.status(400).json('Token is invalid or expired ..');
 
