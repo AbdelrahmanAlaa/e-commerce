@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
-const { User,creatRandomPassword} = require('../models/userModel');
+const { User,creatRandomPassword,validateLogin} = require('../models/userModel');
 const asyncError=require('../middleware/asyncError');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('./../middleware/email');
@@ -14,7 +14,7 @@ exports.auth = async(req,res,next)=>{
         const decoded = await jwt.verify(token,process.env.JWTBRIVETKEY);
         req.user =decoded ;
         next();
-    }
+    } 
     catch(er){
         res.status(400).json({message:'invalid token '})
     }
@@ -44,6 +44,12 @@ exports.register = asyncError(async (req, res,next) => {
 });
 
 exports.login = asyncError(async(req,res)=>{
+
+    const {error} = validateLogin(req.body);
+    if (error)return res.status(400).json({
+        status :"false",
+        message :error.details[0].message
+    });
 
         let user = await User.findOne({email:req.body.email});
         if(!user)return res.status(404).json({
