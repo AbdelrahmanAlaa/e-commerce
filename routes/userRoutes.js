@@ -15,8 +15,16 @@ router
     authUsers.login) 
 
 router
+.route('/getAllUsers')
+.get(authUsers.getAllUsers) 
+
+router
+.route('/getUserById/:id')
+.get( authUsers.getUserById) 
+
+router
 .route('/forgetPassword')
-.post(authUsers.forgetPassword) 
+.get(authUsers.forgetPassword) 
 
 router
 .route('/restPassword/:token')

@@ -4,7 +4,6 @@ const upload = require('./../middleware/cloudinary')
 
 
 exports.createProducts = asyncError(async(req,res)=>{
-    
 
     const {error} = validateProducts(req.body);
     if (error)return res.status(400).json({

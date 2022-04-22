@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
-const { User,creatRandomPassword,validateLogin} = require('../models/userModel');
+const { User,creatRandomPassword} = require('../models/userModel');
 const asyncError=require('../middleware/asyncError');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('./../middleware/email');
@@ -44,12 +44,6 @@ exports.register = asyncError(async (req, res,next) => {
 });
 
 exports.login = asyncError(async(req,res)=>{
-
-    const {error} = validateLogin(req.body);
-    if (error)return res.status(400).json({
-        status :"false",
-        message :error.details[0].message
-    });
 
         let user = await User.findOne({email:req.body.email});
         if(!user)return res.status(404).json({
@@ -141,6 +135,26 @@ exports.restPassword = asyncError(async(req,res)=>{
     })
     
 
+})
+
+exports.getAllUsers = asyncError(async(req,res)=>{
+    const user = await User.find();
+    res.status(200).json({
+        status:'true',
+        user
+        
+    })
+})
+exports.getUserById = asyncError(async(req,res)=>{
+    const user = await User.findById(req.params.id);
+    if(!user)res.status(404).json({
+        status:'false',
+        message:"this user is not found ... "})
+    res.status(200).json({
+        status:'true',
+        user
+        
+    })
 })
 
 
