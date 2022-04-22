@@ -5,6 +5,7 @@ const upload = require('./../middleware/cloudinary')
 
 exports.createProducts = asyncError(async(req,res)=>{
     
+
     const {error} = validateProducts(req.body);
     if (error)return res.status(400).json({
         status :"false",
@@ -15,7 +16,7 @@ exports.createProducts = asyncError(async(req,res)=>{
    if(products) res.status(404).json({
     status:false,   
     message:"this name is created before" })
-    const result = await upload.uploads(req.files[0].path);
+    const result = await upload.uploads(req.file.path);
 
      products = new Products({
         name:req.body.name, 
@@ -27,7 +28,7 @@ exports.createProducts = asyncError(async(req,res)=>{
         country:req.body.country ,
         city:req.body.city ,
         description:req.body.description ,
-        picture:req.files[0].originalname,
+        picture:req.file.originalname,
         url:result.url ,
      });
 
@@ -37,7 +38,7 @@ exports.createProducts = asyncError(async(req,res)=>{
 
 
     res.status(200).json({
-        message:true,
+        message:'true',
         products
     })
 

@@ -1,16 +1,18 @@
 const express = require('express');
 const authUsers = require('../controller/authUsersController');
 const router = express.Router();
-
+const validate = require('./../middleware/validationError')
 
 // routes of review controller
 router
 .route('/register')
-.post(authUsers.register) 
+.post(validate.validateRegister,
+    authUsers.register) 
 
 router
 .route('/login')
-.post(authUsers.login) 
+.post(validate.validateLogin,
+    authUsers.login) 
 
 router
 .route('/forgetPassword')
@@ -18,7 +20,8 @@ router
 
 router
 .route('/restPassword/:token')
-.post(authUsers.restPassword) 
+.post(validate.validateRestPassword,
+    authUsers.restPassword) 
 
 
 

@@ -1,18 +1,26 @@
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
-const { User, validateUser,validateLogin,creatRandomPassword,validateRestPassword} = require('../models/userModel');
+const { User,creatRandomPassword} = require('../models/userModel');
 const asyncError=require('../middleware/asyncError');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('./../middleware/email');
 const crypto = require('crypto')
 
+exports.auth = async(req,res,next)=>{
+    const token = req.header('x-auth-token');
+    if(!token)res.status(401).json({message:'access denied , no token provided'}) ;
+
+    try {
+        const decoded = await jwt.verify(token,process.env.JWTBRIVETKEY);
+        req.user =decoded ;
+        next();
+    }
+    catch(er){
+        res.status(400).json({message:'invalid token '})
+    }
+}
+
 exports.register = asyncError(async (req, res,next) => {
-    const {error} = validateLogin(req.body);
-    if (error)return res.status(400).json({
-        status :"false",
-        message :error.details[0].message
-    });
-    
     
     let user = await User.findOne({ email: req.body.email });
     if (user) return res.status(400).json({
@@ -37,12 +45,6 @@ exports.register = asyncError(async (req, res,next) => {
 
 exports.login = asyncError(async(req,res)=>{
 
-    const {error} = validateLogin(req.body);
-    if (error)return res.status(400).json({
-        status :"false",
-        message :error.details[0].message
-    });
-    
         let user = await User.findOne({email:req.body.email});
         if(!user)return res.status(404).json({
             status:'false',
@@ -92,7 +94,7 @@ exports.forgetPassword = asyncError(async(req,res)=>{
         status
     });
     res.status(200).json({
-        status:'success',
+        status:'true',
         message: "Request was a success",
         message:'validation message sent to your email'
     })}
@@ -113,14 +115,9 @@ exports.restPassword = asyncError(async(req,res)=>{
         passwordRestToken :hashedToken,
         passwordRestExpire:{$gt:Date.now()}
     });
-    if(!user)return res.status(400).json('Token is invalid or expired ..');
-
-     
-    const {error}=validateRestPassword(req.body)
-    if(error)return res.status(404).json({
-        status:'failed',
-        message:error.details[0].message
-    })
+    if(!user)return res.status(400).json({
+        status:'false',
+        message:'Token is invalid or expired ..'});
 
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(req.body.password, salt);
@@ -133,7 +130,7 @@ exports.restPassword = asyncError(async(req,res)=>{
         await user.save();
         res.status(200).json({
         status:'success',
-        message: "successfully rest password",
+        message: "successfully updated your password",
         user
     })
     
