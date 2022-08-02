@@ -3,6 +3,7 @@ const {
   validateSubCategory,
   validateUpdateSubCategory,
 } = require("../../models/subCategoryModel");
+const {Category} = require('../../models/categoryModel')
 
 exports.ValidateCreateSubCategory = async (req, res, next) => {
   try {
@@ -16,7 +17,15 @@ exports.ValidateCreateSubCategory = async (req, res, next) => {
       return res
         .status(404)
         .json({ status: false, message: "this name is created before" });
-    // validate before created
+
+if(req.body.category){
+const category = await Category.findOne({_id:req.body.category});
+if(!category)return res.status(404).json({
+  status:"false",
+  message:"invalid in id"
+})
+}
+        // validate before created
     await validateSubCategory(req.body);
     next();
   } catch (error) {

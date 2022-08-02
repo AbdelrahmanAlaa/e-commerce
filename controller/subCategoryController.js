@@ -19,9 +19,11 @@ exports.getSubCategory = asyncError(async (req, res) => {
   let filterObject = {};
   if (req.params.categoryId) filterObject = { category: req.params.categoryId };
 
+  console.log(filterObject)
   const subCategory = await SubCategory.find({ filterObject })
     .skip(skip)
     .limit(limit);
+    console.log(subCategory)
 
   if (!subCategory)
     res.status(404).json({ message: "this id is not found ..! " });

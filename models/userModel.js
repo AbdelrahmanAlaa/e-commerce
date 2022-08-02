@@ -76,7 +76,7 @@ exports.validateLogin = async(user)=>{
     
     });
      
-    return await Joi.validate(user, schema);
+    return Joi.validate(user, schema);
     
      
 }

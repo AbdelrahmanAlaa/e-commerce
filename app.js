@@ -1,23 +1,23 @@
 // const { limiter } = require('./middleware/limiter');
-const dotenv = require("dotenv");
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 const cors = require("cors");
 const users = require("./routes/userRoutes");
 const subCategory = require("./routes/subCategoryRoutes");
 const category = require("./routes/categoryRoutes");
 const brand = require("./routes/brandRoutes");
 const product = require("./routes/productRoutes");
+require('dotenv').config()
 
-dotenv.config({
-  path: `${__dirname}/config/.env`,
-});
 
 const express = require("express");
 const app = express();
 
+
 app.use(express.json());
 app.use(cors());
 app.options("*", cors());
+
+
 
 app.use("/api/users", users);
 app.use("/api/subCategory", subCategory);
@@ -30,6 +30,23 @@ app.all("*", (req, res, next) => {
   next(err);
 });
 
+mongoose
+  .connect(process.env.CONNECT_DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("connected is done ");
+    const port = process.env.PORT || 3030;
+    app.listen(port, () =>
+    console.log(`Listening on port http://localhost:${port} ...`)
+    )
+  })
+  .catch((err) => {
+    console.log("something is wrong .. ", err);
+  });
+
+
 // global error handling
 app.use((err, req, res, next) => {
   res.status(400).json({ error: err.message });
@@ -41,15 +58,5 @@ process.on("unhandledRejection", (err) => {
 });
 // app.use('/api/forgetPassword', forgetPassword);
 
-mongoose
-  .connect(process.env.CONNECT_DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("connected is done ");
-    const port = process.env.PORT || 3030;
-    const server = app.listen(port, () =>
-      console.log(`Listening on port http://localhost:${port} ...`)
-    );
-  });
+
+

@@ -1,6 +1,6 @@
-const { Product, validateProduct } = require("../models/productModel");
+const { Product} = require("../models/productModel");
 const asyncError = require("../middleware/asyncError");
-const { Category } = require("../models/categoryModel");
+
 
 exports.validReq = (req, res, next) => {
   if (!req.body.categoryId) req.body.category = req.params.categoryId;
@@ -17,6 +17,7 @@ exports.getProduct = asyncError(async (req, res) => {
   const limit = req.query.limit * 1 || 20;
   const skip = (page - 1) * limit;
 
+  console.log(req.query)
   // let filterObject = {};
   // if (req.params.categoryId) filterObject = { category: req.params.categoryId };
 

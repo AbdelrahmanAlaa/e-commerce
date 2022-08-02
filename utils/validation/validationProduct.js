@@ -6,14 +6,16 @@ const {
 const { Category } = require("../../models/categoryModel");
 const { SubCategory } = require("../../models/subCategoryModel");
 const { Brand } = require("../../models/brandModel");
+const { push } = require("@hapi/joi/lib/ref");
+const { forEach } = require("lodash");
 exports.validateProduct = async (req, res, next) => {
   try {
     // validate name and check is created before or not
-    const product = await Product.findOne({ title: req.body.title });
-    if (product)
-      return res
-        .status(404)
-        .send({ message: "this name is exactly created.. " });
+    // const product = await Product.findOne({ title: req.body.title });
+    // if (product)
+    //   return res
+    //     .status(404)
+    //     .send({ message: "this name is exactly created.. " });
     // validate Joi before created
     await validateProduct(req.body);
 
@@ -28,32 +30,33 @@ exports.validateProduct = async (req, res, next) => {
     }
 
     if (req.body.subCategory) {
-      const subCategory = await SubCategory.find({
-        $exist: true,
-        _id: req.body.subCategory,
-      });
-      console.log(subCategory);
+      const subCategory = await SubCategory.find({_id:{$exists:true , $in:req.body.subCategory} });
       if (
         subCategory.length < 1 ||
         req.body.subCategory.length != subCategory.length
       )
         return res.status(404).send({ message: "invalid subCategories ids " });
 
+        // console.log(subCategory)
       const validateCategory = await SubCategory.find({
         category: req.body.category,
       });
+      console.log(validateCategory)
+   const subCategoryId = [];
+   validateCategory.forEach((subCategory)=>{
+    // console.log(subCategory)
+    subCategoryId.push(subCategory._id.toString())
+    
+   })
+  //  console.log(subCategoryId)
 
-      // const subCategoryInDb = [];
-      // validateCategory.forEach((subCategory) => {
-      //   subCategoryInDb.push(subCategory._id.toString());
-      //   console.log(subCategoryInDb);
-      // });
-      //   if (validateCategory.category != req.body.subCategory)
-      //     return res
-      //       .status(404)
-      //       .json({ message: "this category not found in subCategory" });
-    }
+if(!req.body.subCategory.every(x => subCategoryId.includes(x)))
+return res.status(404).json({
+  status:'false',
+  message:'subCategories not belong to category'
+})
 
+}
     next();
   } catch (error) {
     if (error)
