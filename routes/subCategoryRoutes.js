@@ -12,7 +12,8 @@ router
 
 router
   .route("/:id")
-  // .get(subCategory.getSubCategoryByID)
+  .get(subCategory.getSubCategoryByID)
+  
   .patch(validation.validateUpdateSubCategory, subCategory.updateSubCategory)
   .delete(subCategory.deleteSubCategory);
 
