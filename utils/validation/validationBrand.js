@@ -4,7 +4,7 @@ const {
   validateUpdateBrand,
 } = require("../../models/brandModel");
 
-exports.validateCreatBrand = async (req, res, next) => {
+exports.validateCreateBrand = async (req, res, next) => {
   try {
     // validate name and check is created before or not
     const brand = await Brand.findOne({ name: req.body.name });

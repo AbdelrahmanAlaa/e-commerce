@@ -57,4 +57,20 @@ exports.validateProduct = (product) => {
   return Joi.validate(product, schema);
 };
 
+exports.validateUpdateProduct = (product)=>{
+  const schema = Joi.object({
+    title: Joi.string().min(3).max(100),
+    description: Joi.string().min(20).max(255),
+    quantity: Joi.number().min(1).max(500),
+    price: Joi.number().min(1).max(1000000),
+    priceAfterDiscount: Joi.number().max(100000),
+    colors: Joi.array().min(1).max(50),
+    imageCover: Joi.string().min(2).max(50),
+    image: Joi.string(),
+    category: Joi.string(),
+    brand: Joi.string(),
+    subCategory: Joi.array().max(50),
+  })
+}
+
 exports.Product = Product;

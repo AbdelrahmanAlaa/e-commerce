@@ -5,7 +5,7 @@ const validate = require("../utils/validation/validationBrand");
 // const brandRoutes = require("./subBrandRoutes");
 router
   .route("/")
-  .post(validate.validateCreatBrand, brand.creatBrand)
+  .post(validate.validateCreateBrand, brand.createBrand)
   .get(brand.getBrand);
 
 router

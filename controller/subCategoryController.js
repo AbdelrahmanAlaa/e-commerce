@@ -1,6 +1,7 @@
 const { SubCategory } = require("../models/subCategoryModel");
 const asyncError = require("../middleware/asyncError");
-const { Category } = require("../models/categoryModel");
+const ApiFeatures = require('../middleware/apiFeatures');
+const factory = require('./handlersFactory')
 // const upload = require("./../middleware/cloudinary");
 
 exports.createSubCategory = asyncError(async (req, res) => {
@@ -12,23 +13,25 @@ exports.createSubCategory = asyncError(async (req, res) => {
 });
 
 exports.getSubCategory = asyncError(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 20;
-  const skip = (page - 1) * limit;
-
+  
   let filterObject = {};
   if (req.params.categoryId) filterObject = { category: req.params.categoryId };
 
-  console.log(filterObject)
-  const subCategory = await SubCategory.find({ filterObject })
-    .skip(skip)
-    .limit(limit);
-    console.log(subCategory)
+const countDocuments = await SubCategory.countDocuments();
+  const apiFeatures = new ApiFeatures(req.query,SubCategory.find({ filterObject }))
+  .filter()
+  .sort()
+  .search()
+  .paginate(countDocuments)
+  .limitFields();
+
+const {mongooseQuery, paginationResult} = apiFeatures;
+const subCategory = await mongooseQuery ; 
 
   if (!subCategory)
     res.status(404).json({ message: "this id is not found ..! " });
 
-  res.status(200).json({ result: subCategory.length, page, subCategory });
+  res.status(200).json({ result: subCategory.length, paginationResult, subCategory });
 });
 exports.getSubCategoryByID = asyncError(async (req, res) => {
   const subCategory = await SubCategory.findById(req.params.id);
@@ -37,26 +40,5 @@ exports.getSubCategoryByID = asyncError(async (req, res) => {
   res.status(200).json({ subCategory });
 });
 
-exports.updateSubCategory = asyncError(async (req, res) => {
-  const subCategory = await SubCategory.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      new: true,
-    }
-  );
-  if (!subCategory)
-    res.status(404).json({ message: "this id is not found .. " });
-
-  res.status(200).json({ subCategory });
-});
-
-exports.deleteSubCategory = asyncError(async (req, res) => {
-  const subCategory = await SubCategory.findByIdAndDelete(req.params.id, {
-    active: false,
-  });
-  if (!subCategory)
-    res.status(404).json({ message: "this id is not found .. " });
-
-  res.status(200).json({ message: "successfully deleted .. " });
-});
+exports.updateSubCategory = factory.update(SubCategory)
+exports.deleteSubCategory =factory.deleteOne(SubCategory)

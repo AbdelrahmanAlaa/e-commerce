@@ -1,47 +1,36 @@
 const { Product} = require("../models/productModel");
 const asyncError = require("../middleware/asyncError");
-
+const ApiFeatures = require('../middleware/apiFeatures');
+const factory = require('./handlersFactory')
 
 exports.validReq = (req, res, next) => {
   if (!req.body.categoryId) req.body.category = req.params.categoryId;
   next();
 };
 
-exports.createProduct = asyncError(async (req, res) => {
-  const product = await Product.create(req.body);
-  res.status(200).json({ product });
-});
+// exports.createProduct = factory.createOne(Product)
 
 exports.getProduct = asyncError(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 20;
-  const skip = (page - 1) * limit;
 
-  console.log(req.query)
-  // let filterObject = {};
-  // if (req.params.categoryId) filterObject = { category: req.params.categoryId };
+  // Build Query
+  
+  const contDocuments=await Product.countDocuments();
+const apiFeatures = new ApiFeatures(req.query,Product.find())
+.sort()
+.paginate(contDocuments)
+.limitFields()
+.filter()
+.search('Products');
 
-  const product = await Product.find().skip(skip).limit(limit);
-
-  if (!product) res.status(404).json({ message: "this id is not found ..! " });
-
-  res.status(200).json({ result: product.length, page, product });
+ const {mongooseQuery,paginationResult} = apiFeatures; 
+  const product = await mongooseQuery;
+    if (!product) res.status(404).json({ message: "this id is not found ..! " });
+  
+    res.status(200).json({ result: product.length,paginationResult,product });
+  
 });
 
-exports.updateProduct = asyncError(async (req, res) => {
-  const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
-  if (!product) res.status(404).json({ message: "this id is not found .. " });
+exports.updateProduct = factory.update(Product)
 
-  res.status(200).json({ product });
-});
+exports.deleteProduct =factory.deleteOne(Product)
 
-exports.deleteProduct = asyncError(async (req, res) => {
-  const product = await Product.findByIdAndDelete(req.params.id, {
-    active: false,
-  });
-  if (!product) res.status(404).json({ message: "this id is not found .. " });
-
-  res.status(200).json({ message: "successfully deleted .. " });
-});

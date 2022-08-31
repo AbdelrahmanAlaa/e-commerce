@@ -1,7 +1,7 @@
 const {
   Product,
-  validateProduct,
-  // validateUpdate,
+  // validateProduct,
+  validateUpdateProduct,
 } = require("../../models/productModel");
 const { Category } = require("../../models/categoryModel");
 const { SubCategory } = require("../../models/subCategoryModel");
@@ -41,7 +41,7 @@ exports.validateProduct = async (req, res, next) => {
       const validateCategory = await SubCategory.find({
         category: req.body.category,
       });
-      console.log(validateCategory)
+      // console.log(validateCategory)
    const subCategoryId = [];
    validateCategory.forEach((subCategory)=>{
     // console.log(subCategory)
@@ -67,15 +67,15 @@ return res.status(404).json({
   }
 };
 
-// exports.validateUpdate = async (req, res, next) => {
-//   try {
-//     await validateUpdateProduct(req.body);
-//     next();
-//   } catch (error) {
-//     if (error)
-//       await res.status(400).json({
-//         status: "false",
-//         message: error.details[0].message,
-//       });
-//   }
-// };
+exports.validateUpdate = async (req, res, next) => {
+  try {
+    await validateUpdateProduct(req.body);
+    next();
+  } catch (error) {
+    if (error)
+      await res.status(400).json({
+        status: "false",
+        message: error.details[0].message,
+      });
+  }
+};

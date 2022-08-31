@@ -4,8 +4,8 @@ const router = express.Router();
 const validate = require("../utils/validation/validationCategory");
 const subCategoryRoutes = require("./subCategoryRoutes");
 router
-  .route("/creatCategory")
-  .post(validate.validateCategory, category.creatCategory);
+  .route("/createCategory")
+  .post(validate.validateCategory, category.createCategory);
 
 router.route("/getCategory").get(category.getCategory);
 

@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
-const { User,creatRandomPassword} = require('../models/userModel');
+const { User,createRandomPassword} = require('../models/userModel');
 const asyncError=require('../middleware/asyncError');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('./../middleware/email');
@@ -76,7 +76,7 @@ exports.forgetPassword = asyncError(async(req,res)=>{
         message : 'this email is not found ..!'
  });
  
- const restToken = creatRandomPassword();
+ const restToken = createRandomPassword();
     user.passwordRestToken = passwordRestToken;
     user.passwordRestExpire= passwordRestExpire;
 

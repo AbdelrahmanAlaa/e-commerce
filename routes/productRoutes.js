@@ -5,11 +5,12 @@ const validate = require("../utils/validation/validationProduct");
 // const subProductRoutes = require("./subProductRoutes");
 router
   .route("/")
-  .post(validate.validateProduct, product.createProduct)
+  // .post(validate.validateProduct, product.createProduct)
   .get(product.getProduct);
-
-router.route("/:id").delete(product.deleteProduct);
-// .patch(validate.validateUpdateProduct, product.updateProduct);
+  
+  
+  router.route("/:id").delete(product.deleteProduct)
+  .patch(validate.validateUpdate, product.updateProduct);
 
 // router.use("/:productId/subProduct", subProductRoutes);
 module.exports = router;

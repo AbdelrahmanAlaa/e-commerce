@@ -12,7 +12,7 @@ router.route("/getAllUsers").get(authUsers.getAllUsers);
 
 router.route("/getUserById/:id").get(authUsers.getUserById);
 
-router.route("/forgetPassword").get(authUsers.forgetPassword);
+router.route("/forgetPassword").post(authUsers.forgetPassword);
 
 router
   .route("/restPassword/:token")

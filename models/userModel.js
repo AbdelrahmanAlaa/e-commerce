@@ -90,7 +90,7 @@ exports.validateRestPassword = (user)=> {
     return Joi.validate(user, schema);
 } 
 
-exports.creatRandomPassword = function(){
+exports.createRandomPassword = function(){
     const restToken = crypto.randomBytes(3).toString('hex');
     
    passwordRestToken= crypto 
