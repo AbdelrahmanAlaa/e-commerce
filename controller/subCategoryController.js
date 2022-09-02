@@ -23,13 +23,13 @@ const apiFeatures = new ApiFeatures(req.query,SubCategory.find({filterObject}))
 .paginate(contDocuments)
 .limitFields()
 .filter()
-.search('Products');
+.search();
 
  const {mongooseQuery,paginationResult} = apiFeatures; 
   const subCategory = await mongooseQuery;
     if (!subCategory) res.status(404).json({ message: "this id is not found ..! " });
   
-    res.status(200).json({ result: product.length,paginationResult,subCategory });
+    res.status(200).json({ result: subCategory.length,paginationResult,subCategory });
   
 // const countDocuments = await SubCategory.countDocuments();
 //   const apiFeatures = new ApiFeatures(req.query,SubCategory.find({ filterObject }))
