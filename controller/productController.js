@@ -8,7 +8,7 @@ exports.validReq = (req, res, next) => {
   next();
 };
 
-// exports.createProduct = factory.createOne(Product)
+exports.createProduct = factory.create(Product)
 
 exports.getProduct = asyncError(async (req, res) => {
 

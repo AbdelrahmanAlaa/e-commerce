@@ -26,10 +26,9 @@ asyncError(async (req, res) => {
 });
 
 
-exports.createOne = (Model) =>{
+exports.create = (Model) =>
 
   asyncError(async (req, res) => {
   const model = await Model.create(req.body);
   res.status(200).json({ model });
 });
-}
