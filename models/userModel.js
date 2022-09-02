@@ -58,12 +58,12 @@ exports.validateUser = (user)=>{
         password: Joi.string().min(8).max(255).required(),
         confirmPassword: Joi.string().min(8).max(255).required().valid(user.password),
         phone:Joi.string().required(),
-        companyName: Joi.string().min(5).max(50).required(),
+        companyName: Joi.string().min(5).max(50),
         firstAddress: Joi.string().min(5).max(50).required(),
-        secondAddress: Joi.string().min(5).max(50).required(),
+        secondAddress: Joi.string().min(5).max(50),
         country: Joi.string().min(2).max(50).required(),
         city: Joi.string().min(2).max(50).required(),
-        zipCode: Joi.string().min(2).max(50).required()
+        zipCode: Joi.string().min(2).max(50)
         
     });
     return Joi.validate(user, schema);
