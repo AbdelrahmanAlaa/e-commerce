@@ -5,7 +5,7 @@ const validate = require("../utils/validation/validationProduct");
 // const subProductRoutes = require("./subProductRoutes");
 router
   .route("/")
-  // .post(validate.validateProduct, product.createProduct)
+  .post(validate.validateProduct, product.createProduct)
   .get(product.getProduct);
   
   
