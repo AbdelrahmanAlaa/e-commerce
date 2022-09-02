@@ -43,10 +43,11 @@ return this;
 
 //searching 
 search(modelName){
+  console.log(modelName)
   if(this.querySt.keyWords){
     let query = {};
     
-    if(modelName == 'Products'){
+    if(modelName == 'Product'){
     query.$or=[
       {title:{$regex:this.querySt.keyWords,$options:'i'}},
       {description:{$regex:this.querySt.keyWords,$options:'i'}}

@@ -6,11 +6,13 @@ const validate = require("../utils/validation/validationProduct");
 router
   .route("/")
   .post(validate.validateProduct, product.createProduct)
-  .get(product.getProduct);
+  .get(product.getProduct)
   
   
-  router.route("/:id").delete(product.deleteProduct)
-  .patch(validate.validateUpdate, product.updateProduct);
+  router.route("/:id")
+  .delete(product.deleteProduct)
+  .patch(validate.validateUpdate, product.updateProduct)
+  .get(product.getOne)
 
 // router.use("/:productId/subProduct", subProductRoutes);
 module.exports = router;
