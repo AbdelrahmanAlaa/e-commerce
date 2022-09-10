@@ -6,11 +6,11 @@ exports.validReq = (req, res, next) => {
   next();
 };
 
-exports.createProduct = factory.createOne(Product,"Products")
+exports.createProduct = factory.createOne(Product)
 
 exports.getOne  =factory.getOne(Product)
 
-exports.getProduct = factory.getAll(Product)
+exports.getProduct = factory.getAll(Product,"Products")
 
 exports.updateProduct = factory.update(Product)
 

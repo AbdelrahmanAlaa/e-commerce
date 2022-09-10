@@ -1,21 +1,39 @@
-const multer = require('multer')
-
+const multer = require("multer");
 
 const fileStorage = multer.diskStorage({
-    destination:'images',
-    filename:(req,file,cb)=>{
-        cb(null,file.originalname)
-    }
-})
+  destination: function (req, file, cb) {
+    cb(null, "images");
+  },
+});
 
-const fileFilter = (req,file,cb)=>{
-    if(file.mimetype === 'image/png' ||
-    file.mimetype === 'image/jpg' ||
-    file.mimetype === 'image/jpeg'  )
-    {
-        cb(null,true)
-    }else{
-        cb(null,false)
-    }
-}
-module.exports = multer({storage:fileStorage,fileFilter:fileFilter}).any()
+const fileFilter= (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const fileFilterMulter= (req, file, cb) => {
+  if (files.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+exports.uploadSingleImage = multer({
+  storage: fileStorage,
+  fileFilter: fileFilter,
+}).single("imageCover");
+
+exports.uploadMultiImage = multer({
+  storage: fileStorage,
+  fileFilterMulter: fileFilterMulter,
+}).fields([
+  {
+    name: "images",
+    maxCount: "7",
+  }
+
+]);

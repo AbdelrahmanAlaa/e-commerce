@@ -1,27 +1,44 @@
 const {
   Product,
-  // validateProduct,
+   validateProduct,
   validateUpdateProduct,
 } = require("../../models/productModel");
 const { Category } = require("../../models/categoryModel");
 const { SubCategory } = require("../../models/subCategoryModel");
 const { Brand } = require("../../models/brandModel");
-const { push } = require("@hapi/joi/lib/ref");
-const { forEach } = require("lodash");
+const upload = require("../../middleware/cloudinary");
+
 exports.validateProduct = async (req, res, next) => {
   try {
+
     // validate name and check is created before or not
     // const product = await Product.findOne({ title: req.body.title });
     // if (product)
     //   return res
     //     .status(404)
     //     .send({ message: "this name is exactly created.. " });
+console.log(req.body)
+
     // validate Joi before created
     await validateProduct(req.body);
 
+    if (req.files.images) {
+console.log('done')
+      req.body.images = [];
+      await Promise.all(
+        req.files.images.map(async (img) => {
+          const result = await upload.uploads(img.path);
+          req.body.images.push(result);
+          fs.unlinkSync(img.path);
+        })
+      );
+    }
+    
+  if(req.body.category){
     const category = await Category.findById({ _id: req.body.category });
     if (!category)
       return res.status(404).send({ message: " no category  like this id " });
+    }
 
     if (req.body.brand) {
       const brand = await Brand.findById({ _id: req.body.brand });
@@ -57,7 +74,9 @@ return res.status(404).json({
 })
 
 }
+
     next();
+
   } catch (error) {
     if (error)
       return res.status(400).json({

@@ -14,7 +14,7 @@ exports.deleteOne = (Model)=>
       
 exports.update = (Model)=>
 asyncError(async (req, res) => {
-  const model = await Model.findByIdAndUpdate(req.params.id, req.body, {
+  const documents = await Model.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
   if (!documents) return res
@@ -46,23 +46,22 @@ asyncError(async(req,res)=>{
   })
 })
 
-exports.getAll = (Model,modelFilter)=>
+exports.getAll = (Model,modelName)=>
 asyncError(async (req, res) => {
 
   // Build Query
-console.log(modelFilter)
   const contDocuments = await Model.countDocuments();
 const apiFeatures = new ApiFeatures(req.query,Model.find())
 .sort()
 .paginate(contDocuments)
 .limitFields()
 .filter()
-.search(modelFilter);
+.search(modelName);
 
  const {mongooseQuery,paginationResult} = apiFeatures; 
   const documents = await mongooseQuery;
     if (!documents) res.status(404).json({ message: "this id is not found ..! " });
   
-    res.status(200).json({ result: documents.length,paginationResult,decoments: documents });
+    res.status(200).json({ result: documents.length,paginationResult,documents });
   
 });

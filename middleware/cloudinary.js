@@ -1,11 +1,11 @@
 const cloudinary = require('cloudinary');
-
+ require('dotenv').config()
 
 
 cloudinary.config({
-    cloud_name:'car-care3',
-    api_key:'921132538581667',
-    api_secret:'nTeBdjKJiv8tAQBeePnri_VCGx8'
+    cloud_name:process.env.CLOUD_NAME,
+    api_key:process.env.API_KET,
+    api_secret:process.env.API_SECRET
 });
 
    exports.uploads = (file)=>{
