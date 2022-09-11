@@ -60,7 +60,7 @@ exports.validateProduct = (product) => {
 exports.validateUpdateProduct = (product)=>{
   const schema = Joi.object({
     title: Joi.string().min(3).max(100),
-    description: Joi.string().min(20).max(255),
+    description: Joi.string().min(20).max(10000),
     quantity: Joi.number().min(1).max(500),
     price: Joi.number().min(1).max(1000000),
     priceAfterDiscount: Joi.number().max(100000),
