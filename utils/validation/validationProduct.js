@@ -18,22 +18,26 @@ exports.validateProduct = async (req, res, next) => {
     //     .status(404)
     //     .send({ message: "this name is exactly created.. " });
 console.log(req.body)
+console.log(req.files)
 
     // validate Joi before created
     await validateProduct(req.body);
 
-    if (req.files.images) {
-console.log('done')
-      req.body.images = [];
-      await Promise.all(
-        req.files.images.map(async (img) => {
-          const result = await upload.uploads(img.path);
-          req.body.images.push(result);
-          fs.unlinkSync(img.path);
-        })
-      );
-    }
-    
+//     if (req.files.images) {
+// console.log('done images ')
+//       req.body.images = [];
+//       await Promise.all(
+//         req.files.images.map(async (img) => {
+//           const result = await upload.uploads(img.path);
+//           req.body.images.push(result);
+//           fs.unlinkSync(img.path);
+//         })
+//       );
+//     }
+// if(req.file.imageCaver){
+//   console.log('done imageCaver');
+//   const result =await upload.uploads(imageCaver.path)
+// }    
   if(req.body.category){
     const category = await Category.findById({ _id: req.body.category });
     if (!category)
