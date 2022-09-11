@@ -42,7 +42,7 @@ const Product = mongoose.model("Product", schema);
 exports.validateProduct = (product) => {
   const schema = Joi.object({
     title: Joi.string().min(3).max(100).required(),
-    description: Joi.string().min(20).max(255).required(),
+    description: Joi.string().min(20).max(10000).required(),
     quantity: Joi.number().min(1).max(500).required(),
     sold: Joi.number(),
     price: Joi.number().min(1).max(1000000).required(),
