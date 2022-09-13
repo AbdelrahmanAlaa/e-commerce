@@ -31,7 +31,7 @@ const schema = new mongoose.Schema(
 
     colors: [{ type: String }],
 
-    imageCover: { type: String },
+    imageCover: [Array],
 
     images: [{ type: String }],
   },
@@ -48,8 +48,8 @@ exports.validateProduct = (product) => {
     price: Joi.number().min(1).max(1000000).required(),
     priceAfterDiscount: Joi.number().max(100000),
     colors: Joi.array().min(1).max(50).required(),
-    imageCover: Joi.string().min(2).max(10000000).required(),
-    images: Joi.array().max(7),
+    imageCover: Joi,
+    // images: Joi,
     category: Joi.string().required(),
     brand: Joi.string(),
     subCategory: Joi.array().max(50),

@@ -2,10 +2,11 @@ const express = require("express");
 const product = require("../controller/productController");
 const router = express.Router();
 const validate = require("../utils/validation/validationProduct");
+const {uploadMultiImage,uploadSingleImage} = require('../middleware/multer');
 // const subProductRoutes = require("./subProductRoutes");
 router
   .route("/")
-  .post(validate.validateProduct, product.createProduct)
+  .post(uploadMultiImage,validate.validateProduct, product.createProduct)
   .get(product.getProduct)
   
   

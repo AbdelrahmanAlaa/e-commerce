@@ -8,10 +8,16 @@ cloudinary.config({
     api_secret:process.env.API_SECRET
 });
 
-   exports.uploads = (file)=>{
-    return new Promise(resolve=>{
-      cloudinary.uploader.upload(file,(result)=>{
-        resolve({url:result.url , id: result.public_id})
-      },{resource_type:"auto"})
-    })
-   }
+
+exports.uploads = async (file) => {
+  return new Promise((resolve) => {
+    cloudinary.uploader.upload(
+      file,
+      (res) => {
+        // if (err) return res.status(500).send("upload image error");
+        resolve({ url: res.url, id: res.public_id });
+      },
+      { resource_type: "auto" }
+    );
+  });
+};

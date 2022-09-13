@@ -34,6 +34,10 @@ exports.uploadMultiImage = multer({
   {
     name: "images",
     maxCount: "7",
+  },
+  {
+    name:"imageCover",
+    maxCount:"2"
   }
 
 ]);

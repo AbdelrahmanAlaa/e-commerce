@@ -6,9 +6,10 @@ const {
 const { Category } = require("../../models/categoryModel");
 const { SubCategory } = require("../../models/subCategoryModel");
 const { Brand } = require("../../models/brandModel");
-const upload = require("../../middleware/cloudinary");
-
-exports.validateProduct = async (req, res, next) => {
+ const upload = require('../../middleware/cloudinary')
+ const asyncError = require("../../middleware/asyncError")
+ const fs = require('fs')
+exports.validateProduct = asyncError(async (req, res, next) => {
   try {
 
     // validate name and check is created before or not
@@ -17,27 +18,38 @@ exports.validateProduct = async (req, res, next) => {
     //   return res
     //     .status(404)
     //     .send({ message: "this name is exactly created.. " });
-console.log(req.body)
-console.log(req.files)
 
+// console.log(req.file)
+
+// console.log(req.body)
     // validate Joi before created
-    await validateProduct(req.body);
 
-//     if (req.files.images) {
-// console.log('done images ')
-//       req.body.images = [];
-//       await Promise.all(
-//         req.files.images.map(async (img) => {
-//           const result = await upload.uploads(img.path);
-//           req.body.images.push(result);
-//           fs.unlinkSync(img.path);
-//         })
-//       );
-//     }
-// if(req.file.imageCaver){
-//   console.log('done imageCaver');
-//   const result =await upload.uploads(imageCaver.path)
-// }    
+    // if (req.files.images) {
+    //   req.body.images = [];
+    //   await Promise.all(
+    //     req.files.images.map(async (img) => {
+    //       console.log(img.path)
+    //       const result = await upload.uploads(img.path);
+    //       console.log(result)
+    //       req.body.images.push(result);
+    //       fs.unlinkSync(img.path);
+    //     })
+    //   );
+    // }
+   
+if (req.files.imageCover){
+  req.body.imageCover = [];
+  await Promise.all(
+    req.files.imageCover.map(async (img) => {
+      const result = await upload.uploads(img.path);
+      console.log(result)
+      req.body.imageCover.push(result);
+      fs.unlinkSync(img.path);
+    })
+  );
+}
+await validateProduct(req.body);
+
   if(req.body.category){
     const category = await Category.findById({ _id: req.body.category });
     if (!category)
@@ -88,7 +100,7 @@ return res.status(404).json({
         message: error.details[0].message,
       });
   }
-};
+})
 
 exports.validateUpdate = async (req, res, next) => {
   try {

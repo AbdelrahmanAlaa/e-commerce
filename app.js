@@ -6,13 +6,16 @@ const subCategory = require("./routes/subCategoryRoutes");
 const category = require("./routes/categoryRoutes");
 const brand = require("./routes/brandRoutes");
 const product = require("./routes/productRoutes");
+const bodyParser = require('body-parser');
 require('dotenv').config()
 
 
 const express = require("express");
 const app = express();
 
-
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+app.use(express.static("images"));
 app.use(express.json());
 app.use(cors());
 app.options("*", cors());
