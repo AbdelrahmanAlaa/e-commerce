@@ -1,116 +1,147 @@
-const {
-  Product,
-   validateProduct,
-  validateUpdateProduct,
-} = require("../../models/productModel");
+const { body, check } = require("express-validator");
+const validatorMiddleware = require("../../middleware/validatorMiddleware");
 const { Category } = require("../../models/categoryModel");
 const { SubCategory } = require("../../models/subCategoryModel");
-const { Brand } = require("../../models/brandModel");
- const upload = require('../../middleware/cloudinary')
- const asyncError = require("../../middleware/asyncError")
- const fs = require('fs')
-exports.validateProduct = asyncError(async (req, res, next) => {
-  try {
+exports.createProductValidators = [
+  check("title")
+    .notEmpty()
+    .withMessage("Product title is required")
+    .isLength({ min: 3 })
+    .withMessage("must be at least 3 chars"),
 
-    // validate name and check is created before or not
-    // const product = await Product.findOne({ title: req.body.title });
-    // if (product)
-    //   return res
-    //     .status(404)
-    //     .send({ message: "this name is exactly created.. " });
+  check("description")
+    .notEmpty()
+    .withMessage("Product description is required ")
+    .isLength({ min: 3 })
+    .withMessage("must be at least 3 chars")
+    .isLength({ max: 2000 })
+    .withMessage("must be at least 2000 chars"),
 
-// console.log(req.file)
+  check("quantity")
+    .notEmpty()
+    .withMessage("Product quantity is required")
+    .isNumeric()
+    .withMessage("Products quantity must be number"),
 
-// console.log(req.body)
-    // validate Joi before created
+  check("sold")
+    .optional()
+    .isNumeric()
+    .withMessage("Products quantity must be number"),
 
-    // if (req.files.images) {
-    //   req.body.images = [];
-    //   await Promise.all(
-    //     req.files.images.map(async (img) => {
-    //       console.log(img.path)
-    //       const result = await upload.uploads(img.path);
-    //       console.log(result)
-    //       req.body.images.push(result);
-    //       fs.unlinkSync(img.path);
-    //     })
-    //   );
-    // }
-   
-if (req.files.imageCover){
-  req.body.imageCover = [];
-  await Promise.all(
-    req.files.imageCover.map(async (img) => {
-      const result = await upload.uploads(img.path);
-      console.log(result)
-      req.body.imageCover.push(result);
-      fs.unlinkSync(img.path);
-    })
-  );
-}
-await validateProduct(req.body);
+  check("price")
+    .notEmpty()
+    .withMessage("Product price is required")
+    .isNumeric()
+    .withMessage("Products price must be number")
+    .isLength({ max: 32 })
+    .withMessage("To long password "),
 
-  if(req.body.category){
-    const category = await Category.findById({ _id: req.body.category });
-    if (!category)
-      return res.status(404).send({ message: " no category  like this id " });
-    }
+  check("priceAfterDiscount")
+    .optional()
+    .isNumeric()
+    .withMessage("Product priceAfterDiscount must be a number")
+    .toFloat()
+    .custom((value, { req }) => {
+      if (req.body.price <= value) {
+        throw new Error("priceAfterDiscount must be lower than price");
+      }
+      return true;
+    }),
 
-    if (req.body.brand) {
-      const brand = await Brand.findById({ _id: req.body.brand });
-      if (!brand)
-        return res.status(404).send({ message: " No brand like this id  " });
-    }
+  check("colors")
+    .optional()
+    .isArray()
+    .withMessage("availableColors should be array of string "),
 
-    if (req.body.subCategory) {
-      const subCategory = await SubCategory.find({_id:{$exists:true , $in:req.body.subCategory} });
-      if (
-        subCategory.length < 1 ||
-        req.body.subCategory.length != subCategory.length
+  check("imageCover")
+    .notEmpty()
+    .withMessage("Product imageCover is required  "),
+
+  check("images")
+    .optional()
+    .isArray()
+    .withMessage("images should be array of string"),
+
+  check("category")
+    .notEmpty()
+    .withMessage("Product categoryId is required ")
+    .isMongoId()
+    .withMessage("Invalid Id formate ")
+    .custom((categoryId) =>
+      Category.findById(categoryId).then((category) => {
+        if (!category) {
+          return Promise.reject(
+            new Error(`No category for this id: ${categoryId}`)
+          );
+        }
+      })
+    ),
+
+  check("subCategory")
+    .optional()
+    .isMongoId()
+    .withMessage("Invalid Id formate ")
+    .custom((subcategoriesIds) =>
+      SubCategory.find({ _id: { $exists: true, $in: subcategoriesIds } }).then(
+        (result) => {
+          if (result.length < 1 || result.length !== subcategoriesIds.length) {
+            return Promise.reject(new Error(`Invalid subcategories Ids`));
+          }
+        }
       )
-        return res.status(404).send({ message: "invalid subCategories ids " });
+    )
+    .custom((val, { req }) =>
+      SubCategory.find({ category: req.body.category }).then(
+        (subcategories) => {
+          const subCategoriesIdsInDB = [];
+          subcategories.forEach((subCategory) => {
+            subCategoriesIdsInDB.push(subCategory._id.toString());
+          });
+          // check if subcategories ids in db include subcategories in req.body (true)
+          const checker = (target, arr) => target.every((v) => arr.includes(v));
+          if (!checker(val, subCategoriesIdsInDB)) {
+            return Promise.reject(
+              new Error(`subcategories not belong to category`)
+            );
+          }
+        }
+      )
+    ),
 
-        // console.log(subCategory)
-      const validateCategory = await SubCategory.find({
-        category: req.body.category,
-      });
-      // console.log(validateCategory)
-   const subCategoryId = [];
-   validateCategory.forEach((subCategory)=>{
-    // console.log(subCategory)
-    subCategoryId.push(subCategory._id.toString())
-    
-   })
-  //  console.log(subCategoryId)
+  check("brand").optional().isMongoId().withMessage("Invalid ID formate"),
+  check("ratingsAverage")
+    .optional()
+    .isNumeric()
+    .withMessage("ratingsAverage must be a number")
+    .isLength({ min: 1 })
+    .withMessage("Rating must be above or equal 1.0")
+    .isLength({ max: 5 })
+    .withMessage("Rating must be below or equal 5.0"),
+  check("ratingsQuantity")
+    .optional()
+    .isNumeric()
+    .withMessage("ratingsQuantity must be a number"),
 
-if(!req.body.subCategory.every(x => subCategoryId.includes(x)))
-return res.status(404).json({
-  status:'false',
-  message:'subCategories not belong to category'
-})
+  validatorMiddleware,
+];
 
-}
+exports.getProductValidator = [
+  check("id").isMongoId().withMessage("Invalid ID formate"),
+  validatorMiddleware,
+];
 
-    next();
+exports.updateProductValidator = [
+  check("id").isMongoId().withMessage("Invalid ID formate"),
+  body("title")
+    .optional()
+    .custom((val, { req }) => {
+      req.body.slug = slugify(val);
+      return true;
+    }),
+  validatorMiddleware,
+];
 
-  } catch (error) {
-    if (error)
-      return res.status(400).json({
-        status: "false",
-        message: error.details[0].message,
-      });
-  }
-})
-
-exports.validateUpdate = async (req, res, next) => {
-  try {
-    await validateUpdateProduct(req.body);
-    next();
-  } catch (error) {
-    if (error)
-      await res.status(400).json({
-        status: "false",
-        message: error.details[0].message,
-      });
-  }
-};
+exports.deleteProductValidator = [
+  check("id").isMongoId().withMessage("Invalid ID formate"),
+  validatorMiddleware,
+];

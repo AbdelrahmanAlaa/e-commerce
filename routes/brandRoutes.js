@@ -1,17 +1,31 @@
 const express = require("express");
-const brand = require("../controller/brandController");
 const router = express.Router();
-const validate = require("../utils/validation/validationBrand");
+const {
+  createBrand,
+  deleteBrand,
+  getBrand,
+  resizeImage,
+  updateBrand,
+  uploadImage,
+} = require("../controller/brandController");
+
+const {
+  createBrandValidator,
+  deleteBrandValidator,
+  getBrandValidator,
+  updateBrandValidator,
+} = require("../utils/validation/validationBrand");
+
 // const brandRoutes = require("./subBrandRoutes");
-router
-  .route("/")
-  .post(validate.validateCreateBrand, brand.createBrand)
-  .get(brand.getBrand);
 
 router
+  .route("/")
+  .get(getBrand)
+  .post(uploadImage, resizeImage, createBrandValidator, createBrand);
+router
   .route("/:id")
-  .delete(brand.deleteBrand)
-  .patch(validate.validateUpdate, brand.updateBrand);
+  .delete(deleteBrand)
+  .patch(uploadImage, resizeImage, updateBrand);
 
 // router.use("/:brandId/subBrand", brandRoutes);
 module.exports = router;

@@ -1,14 +1,21 @@
-const { Category } = require("../models/categoryModel");
-const asyncError = require("../middleware/asyncError");
+const sharp = require('sharp')
+const asyncHandler = require('express-async-handler')
+
 const ApiFeatures = require('../middleware/apiFeatures')
 const factory = require('./handlersFactory.js')
+const {uploadSingleImage} = require('../middleware/multer') 
+const { Category } = require("../models/categoryModel");
 
-exports.createCategory = asyncError(async (req, res) => {
-  const category = await Category.create({ name: req.body.name });
-  res.status(200).json({ status: "true", category });
-});
 
-exports.getCategory = asyncError(async (req, res) => {
+
+  exports.uploadImage = uploadSingleImage('image')
+
+exports.resizeImage = factory.resizeImage('category',600 , 600)
+
+
+exports.createCategory = factory.createOne(Category)
+
+exports.getCategory = asyncHandler(async (req, res) => {
  
   const contDocuments=await Category.countDocuments();
 

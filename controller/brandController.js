@@ -1,16 +1,19 @@
-const { Brand } = require("../models/brandModel");
-const asyncError = require("../middleware/asyncError");
+const asyncHandler = require('express-async-handler')
+
 const ApiFeatures = require("../middleware/apiFeatures");
 const factory =require('./handlersFactory')
-exports.createBrand = asyncError(async (req, res) => {
-  let brand = new Brand({
-    name: req.body.name,
-  });
-  await brand.save();
-  res.status(200).json({ status: "true", brand });
-});
+const {uploadSingleImage} = require('../middleware/multer')
+const { Brand } = require("../models/brandModel");
 
-exports.getBrand = asyncError(async (req, res) => {
+
+exports.uploadImage = uploadSingleImage('image')
+
+exports.resizeImage = factory.resizeImage('brand',600 , 600)
+
+
+exports.createBrand = factory.createOne(Brand)
+
+exports.getBrand = asyncHandler(async (req, res) => {
    
   const contDocuments=await Brand.countDocuments();
 

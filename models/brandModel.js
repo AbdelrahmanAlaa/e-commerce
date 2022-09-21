@@ -1,4 +1,4 @@
-const Joi = require("@hapi/joi");
+// const Joi = require("@hapi/joi");
 const mongoose = require("mongoose");
 
 const brandSchema = new mongoose.Schema(
@@ -9,20 +9,21 @@ const brandSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+const setImageUrl = (doc) => {
+  if (doc.image) {
+    const imageUrl = `${process.env.BASE_URL}/category/${doc.image}`;
+    doc.image = imageUrl;
+  }
+};
+
+brandSchema.post("init", (doc) => {
+  setImageUrl(doc);
+});
+// for post
+brandSchema.post("save", (doc) => {
+  setImageUrl(doc);
+});
+
 const Brand = mongoose.model("Brand", brandSchema);
-
-exports.validateBrand = (brand) => {
-  const schema = Joi.object({
-    name: Joi.string().min(3).max(50).required(),
-  });
-  return Joi.validate(brand, schema);
-};
-
-exports.validateUpdateBrand = (brand) => {
-  const schema = Joi.object({
-    name: Joi.string().min(3).max(50),
-  });
-  return Joi.validate(brand, schema);
-};
 
 exports.Brand = Brand;

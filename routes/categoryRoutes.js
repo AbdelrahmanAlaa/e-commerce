@@ -1,19 +1,41 @@
 const express = require("express");
-const category = require("../controller/categoryController");
+const { protect } = require("../controller/authUsersController");
+const {
+  createCategory,
+  deleteCategory,
+  getCategory,
+  resizeImage,
+  updateCategory,
+  uploadImage,
+} = require("../controller/categoryController");
 const router = express.Router();
-const validate = require("../utils/validation/validationCategory");
+const {
+  createCategoryValidator,
+  deleteCategoryValidator,
+  getCategoryValidator,
+  updateCategoryValidator,
+} = require("../utils/validation/validationCategory");
 const subCategoryRoutes = require("./subCategoryRoutes");
+
 router
   .route("/createCategory")
-  .post(validate.validateCategory, category.createCategory);
+  .post(
+    protect,
+    uploadImage,
+    resizeImage,
+    createCategoryValidator,
+    createCategory
+  );
 
-router.route("/getCategory").get(category.getCategory);
+router.route("/getCategory").get(getCategory);
 
-router.route("/deleteCategory/:id").delete(category.deleteCategory);
+router
+  .route("/deleteCategory/:id")
+  .delete(deleteCategoryValidator, deleteCategory);
 
 router
   .route("/updateCategory/:id")
-  .patch(validate.validateUpdate, category.updateCategory);
+  .patch(uploadImage, resizeImage, updateCategoryValidator, updateCategory);
 
 router.use("/:categoryId/subCategory", subCategoryRoutes);
 module.exports = router;

@@ -9,15 +9,19 @@ cloudinary.config({
 });
 
 
-exports.uploads = async (file) => {
-  return new Promise((resolve) => {
-    cloudinary.uploader.upload(
-      file,
-      (res) => {
-        // if (err) return res.status(500).send("upload image error");
-        resolve({ url: res.url, id: res.public_id });
-      },
-      { resource_type: "auto" }
-    );
-  });
+exports.uploads =  (file) => {
+  return (resolve => {
+    cloudinary.v2.uploader.upload(file,
+  { public_id: "olympic_flag" }, 
+  function(error, result) {console.log(result); });
+    // cloudinary.uploader.upload(
+    //   file,
+    //   (res) => {
+    //     // if (err) return res.status(500).send("upload image error");
+    //     resolve({ url: res.url, id: res.public_id });
+    //   },
+    //   { resource_type: "auto" }
+    //   );
+    //   console.log(resolve)
+    });
 };

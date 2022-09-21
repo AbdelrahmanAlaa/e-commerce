@@ -1,19 +1,31 @@
 const express = require("express");
-const product = require("../controller/productController");
+const {
+  createProduct,
+  deleteProduct,
+  getOne,
+  getProduct,
+  resizeImage,
+  updateProduct,
+  uploadImage,
+} = require("../controller/productController");
 const router = express.Router();
-const validate = require("../utils/validation/validationProduct");
-const {uploadMultiImage,uploadSingleImage} = require('../middleware/multer');
-// const subProductRoutes = require("./subProductRoutes");
+const {
+  createProductValidators,
+  deleteProductValidator,
+  getProductValidator,
+  updateProductValidator,
+} = require("../utils/validation/validationProduct");
+
 router
   .route("/")
-  .post(uploadMultiImage,validate.validateProduct, product.createProduct)
-  .get(product.getProduct)
-  
-  
-  router.route("/:id")
-  .delete(product.deleteProduct)
-  .patch(validate.validateUpdate, product.updateProduct)
-  .get(product.getOne)
+  .post(uploadImage, resizeImage, createProductValidators, createProduct)
+  .get(getProductValidator, getProduct);
+
+router
+  .route("/:id")
+  .delete(deleteProductValidator, deleteProduct)
+  .patch(updateProductValidator, updateProduct)
+  .get(getOne);
 
 // router.use("/:productId/subProduct", subProductRoutes);
 module.exports = router;

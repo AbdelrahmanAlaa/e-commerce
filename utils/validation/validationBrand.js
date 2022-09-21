@@ -1,38 +1,29 @@
-const {
-  Brand,
-  validateBrand,
-  validateUpdateBrand,
-} = require("../../models/brandModel");
+const { check, body } = require("express-validator");
+const validatorMiddleware = require("../../middleware/validatorMiddleware");
 
-exports.validateCreateBrand = async (req, res, next) => {
-  try {
-    // validate name and check is created before or not
-    const brand = await Brand.findOne({ name: req.body.name });
-    if (brand)
-      return res
-        .status(404)
-        .send({ message: "this name is exactly created.. " });
-    // validate before register
-    await validateBrand(req.body);
-    next();
-  } catch (error) {
-    if (error)
-      await res.status(400).json({
-        status: "false",
-        message: error.details[0].message,
-      });
-  }
-};
+exports.getBrandValidator = [
+  check("id").isMongoId().withMessage("invalid Brand id format "),
+  validatorMiddleware,
+];
 
-exports.validateUpdate = async (req, res, next) => {
-  try {
-    await validateUpdateBrand(req.body);
-    next();
-  } catch (error) {
-    if (error)
-      await res.status(400).json({
-        status: "false",
-        message: error.details[0].message,
-      });
-  }
-};
+exports.createBrandValidator = [
+  check("name")
+    .notEmpty()
+    .withMessage("Brand required")
+    .isLength({ min: 3 })
+    .withMessage("Too short Brand name")
+    .isLength({ max: 32 })
+    .withMessage("Too long Brand name"),
+  validatorMiddleware,
+];
+
+exports.updateBrandValidator = [
+  check("id").isMongoId().withMessage("Invalid Brand id format "),
+  body("name").optional(),
+  validatorMiddleware,
+];
+
+exports.deleteBrandValidator = [
+  check("id").isMongoId().withMessage("Invalid Brand id format"),
+  validatorMiddleware,
+];

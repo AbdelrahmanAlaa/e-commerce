@@ -1,5 +1,6 @@
 const Joi = require("@hapi/joi");
 const mongoose = require("mongoose");
+require('dotenv').config();
 
 const schema = new mongoose.Schema(
   {
@@ -31,12 +32,38 @@ const schema = new mongoose.Schema(
 
     colors: [{ type: String }],
 
-    imageCover: [Array],
+    imageCover: {type:String},
 
     images: [{ type: String }],
   },
   { timestamps: true }
 );
+
+const setUrlImages = (doc)=>{
+  
+ if(doc.imageCover ){
+  const imageUrl = `${process.env.BASE_URL}/products/${doc.imageCover}`
+  doc.imageCover = imageUrl
+}
+if(doc.images){
+images = [];
+   doc.images.forEach((doc)=>{
+    console.log(doc)
+  const imageUrl = `${process.env.BASE_URL}/products/${doc}`
+images.push(imageUrl)
+  })
+  doc.images = images;
+
+}
+}
+// for find and update 
+schema.post('init',(doc)=>{
+  setUrlImages(doc)
+ })
+//  for post 
+ schema.post('save',(doc)=>{
+  setUrlImages(doc)
+ })
 const Product = mongoose.model("Product", schema);
 
 exports.validateProduct = (product) => {
@@ -49,7 +76,7 @@ exports.validateProduct = (product) => {
     priceAfterDiscount: Joi.number().max(100000),
     colors: Joi.array().min(1).max(50).required(),
     imageCover: Joi,
-    // images: Joi,
+    images: Joi,
     category: Joi.string().required(),
     brand: Joi.string(),
     subCategory: Joi.array().max(50),
@@ -71,6 +98,9 @@ exports.validateUpdateProduct = (product)=>{
     brand: Joi.string(),
     subCategory: Joi.array().max(50),
   })
+  return Joi.validate(product, schema);
 }
+
+
 
 exports.Product = Product;

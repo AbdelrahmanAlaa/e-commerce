@@ -1,20 +1,29 @@
 const express = require("express");
-const subCategory = require("../controller/subCategoryController");
+const {
+  createSubCategory,
+  deleteSubCategory,
+  getSubCategory,
+  getSubCategoryByID,
+  updateSubCategory,
+} = require("../controller/subCategoryController");
 // const authUser = require("../controller/authUsersController");
-// const admin = require("../middleware/admin");
 const router = express.Router({ mergeParams: true });
-// const multerConfig = require("../middleware/multer");
-const validation = require("../utils/validation/validationSubCategory");
+
+const {
+  createSubCategoryValidator,
+  deleteSubCategoryValidator,
+  getSubCategoryValidator,
+  updateSubCategoryValidator,
+} = require("../utils/validation/validationSubCategory");
 router
   .route("/")
-  .post(validation.ValidateCreateSubCategory, subCategory.createSubCategory)
-  .get(subCategory.getSubCategory);
+  .post(createSubCategoryValidator, createSubCategory)
+  .get(getSubCategory);
 
 router
   .route("/:id")
-  .get(subCategory.getSubCategoryByID)
-  
-  .patch(validation.validateUpdateSubCategory, subCategory.updateSubCategory)
-  .delete(subCategory.deleteSubCategory);
+  .get(getSubCategoryValidator, getSubCategoryByID)
+  .patch(updateSubCategoryValidator, updateSubCategory)
+  .delete(deleteSubCategoryValidator, deleteSubCategory);
 
 module.exports = router;
