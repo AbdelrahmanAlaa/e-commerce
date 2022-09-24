@@ -15,15 +15,33 @@ const {
   getSubCategoryValidator,
   updateSubCategoryValidator,
 } = require("../utils/validation/validationSubCategory");
+
+const { protect, allowedTo } = require("../controller/authUsersController");
+
 router
   .route("/")
-  .post(createSubCategoryValidator, createSubCategory)
+  .post(
+    protect,
+    allowedTo("admin", "manger"),
+    createSubCategoryValidator,
+    createSubCategory
+  )
   .get(getSubCategory);
 
 router
   .route("/:id")
   .get(getSubCategoryValidator, getSubCategoryByID)
-  .patch(updateSubCategoryValidator, updateSubCategory)
-  .delete(deleteSubCategoryValidator, deleteSubCategory);
+  .patch(
+    protect,
+    allowedTo("admin", "manger"),
+    updateSubCategoryValidator,
+    updateSubCategory
+  )
+  .delete(
+    protect,
+    allowedTo("admin"),
+    deleteSubCategoryValidator,
+    deleteSubCategory
+  );
 
 module.exports = router;

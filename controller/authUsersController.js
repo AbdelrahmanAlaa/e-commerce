@@ -32,10 +32,10 @@ exports.protect = asyncHandler(async (req, res, next) => {
   }
   // verify token (no change happen or expired )
   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-  console.log(decoded);
 
   // check if user exists
   const checkUser = await User.findById(decoded._id);
+
   if (!checkUser) {
     return res
       .status(401)
@@ -56,10 +56,9 @@ exports.protect = asyncHandler(async (req, res, next) => {
         )
       );
     }
-    console.log(passChangeTime);
   }
 
-  req.user = decoded;
+  req.user = checkUser;
 
   next();
 });
@@ -100,25 +99,30 @@ exports.login = asyncHandler(async (req, res, next) => {
     });
 });
 
-exports.forgetPassword = asyncHandler(async (req, res) => {
+exports.allowedTo = (...roles) =>
+  asyncHandler(async (req, res, next) => {
+    console.log(req.user.name);
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ApiError("you are not allowed to access this route .. ", 403)
+      );
+    }
+    next();
+  });
+
+exports.forgetPassword = asyncHandler(async (req, res, next) => {
   let user = await User.findOne({ email: req.body.email });
   if (!user)
-    res.status(404).json({
-      status: "false",
-      message: "this email is not found ..!",
-    });
+    return next(new ApiError(`there is no email like ${req.body.email}`));
 
   const restToken = createRandomPassword();
+
   user.passwordRestToken = passwordRestToken;
   user.passwordRestExpire = passwordRestExpire;
 
   await user.save();
 
-  const restURL = `${restToken}`;
-
-  const status = `Forgot Your password ? Submit a PATCH request with  your new password and 
-    passwordConfirm to : <br>  your code : ${restURL} .<>  If you didn't forget your password , \n please ignore this email! `;
-
+  const status = `Hi ${user.name}, \b We received a request to the password on your E-shop Account . \n   ${restToken}\p   \n Enter this code to complete  the rest . \n Thanks for helping us keep your account secure .`;
   try {
     await sendEmail({
       email: user.email,
@@ -139,6 +143,15 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
       .json("there was an error sending the email , try again later !!");
   }
 });
+
+// exports.verifyPassRestCode = asyncHandler(async(req,res)=>{
+
+//   const restToken = crypto
+//     .createHash("sha256")
+//       .update(req.body.restToken)
+//     .digest("hex");
+
+// })
 
 exports.restPassword = asyncHandler(async (req, res) => {
   const hashedToken = crypto

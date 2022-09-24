@@ -1,6 +1,7 @@
 const express = require("express");
-const { protect } = require("../controller/authUsersController");
+const { protect, allowedTo } = require("../controller/authUsersController");
 const {
+  getCategoryById,
   createCategory,
   deleteCategory,
   getCategory,
@@ -18,24 +19,29 @@ const {
 const subCategoryRoutes = require("./subCategoryRoutes");
 
 router
-  .route("/createCategory")
+  .route("/")
+  .get(getCategory)
   .post(
     protect,
+    allowedTo("admin", "manger"),
     uploadImage,
     resizeImage,
     createCategoryValidator,
     createCategory
   );
 
-router.route("/getCategory").get(getCategory);
-
 router
-  .route("/deleteCategory/:id")
-  .delete(deleteCategoryValidator, deleteCategory);
-
-router
-  .route("/updateCategory/:id")
-  .patch(uploadImage, resizeImage, updateCategoryValidator, updateCategory);
+  .route("/:id")
+  .get(getCategoryValidator, getCategoryById)
+  .delete(protect, allowedTo("admin"), deleteCategoryValidator, deleteCategory)
+  .patch(
+    protect,
+    allowedTo("admin", "manger"),
+    uploadImage,
+    resizeImage,
+    updateCategoryValidator,
+    updateCategory
+  );
 
 router.use("/:categoryId/subCategory", subCategoryRoutes);
 module.exports = router;

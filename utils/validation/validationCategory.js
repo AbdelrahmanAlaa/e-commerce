@@ -16,7 +16,7 @@ exports.createCategoryValidator = [
     .isLength({ max: 32 })
     .withMessage("Too long category name")
     .custom((val) =>
-      Category.find({ name: val }).then((category) => {
+      Category.findOne({ name: val }).then((category) => {
         if (category)
           return Promise.reject(new Error(`this name is exactly created.`));
       })
@@ -34,7 +34,7 @@ exports.updateCategoryValidator = [
     .withMessage("Too long category name")
     .optional()
     .custom((val) =>
-      Category.find({ name: val }).then((category) => {
+      Category.findOne({ name: val }).then((category) => {
         if (category)
           return Promise.reject(new Error(`this name is exactly created.`));
       })

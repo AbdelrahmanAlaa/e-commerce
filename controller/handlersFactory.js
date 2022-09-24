@@ -73,14 +73,15 @@ exports.getAll = (Model, modelName) =>
 
 exports.resizeImage = (folderName, x, y) =>
   asyncHandler(async (req, res, next) => {
-    const filename = `category-${uuidv4()}.jpeg`;
-    await sharp(req.file.buffer)
-      .resize(x, y)
-      .toFormat("jpeg")
-      .jpeg({ quality: 95 })
-      .toFile(`images/${folderName}/${filename}`);
+    if (req.file) {
+      const filename = `category-${uuidv4()}.jpeg`;
+      await sharp(req.file.buffer)
+        .resize(x, y)
+        .toFormat("jpeg")
+        .jpeg({ quality: 95 })
+        .toFile(`images/${folderName}/${filename}`);
 
-    req.body.image = filename;
-
+      req.body.image = filename;
+    }
     next();
   });
