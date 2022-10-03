@@ -58,7 +58,7 @@ exports.resizeImage = async (req, res, next) => {
 
 exports.createProduct = factory.createOne(Product);
 
-exports.getProductById = factory.getOne(Product);
+exports.getProductById = factory.getOne(Product, "reviews");
 
 exports.getProduct = factory.getAll(Product, "Products");
 

@@ -18,20 +18,27 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
   },
-
-  country: {
-    type: String,
-  },
-
-  isAdmin: {
-    type: Boolean,
-    default: false,
-  },
   role: {
     type: String,
     enum: ["user", "admin", "manger"],
     default: "user",
   },
+  wishList: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Product",
+    },
+  ],
+  addresses: [
+    {
+      id: { type: mongoose.Schema.ObjectId },
+      alias: String,
+      street: String,
+      city: String,
+      phone: String,
+      state: String,
+    },
+  ],
   passwordRestToken: String,
   passwordChangedAt: Date,
   passwordRestExpire: String,

@@ -18,7 +18,7 @@ const sendEmail = async (options) => {
           },
         ],
         subject: options.subject,
-        Text: options.status,
+        HTMLPart: options.status,
         CustomID: "AppGettingStartedTest",
       },
     ],

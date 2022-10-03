@@ -61,7 +61,6 @@ exports.getUserValidator = [
 ];
 
 exports.updateUserValidator = [
-  check("id").isMongoId().withMessage("Invalid User id format"),
   body("name")
     .optional()
     .isLength({ min: 3 })
@@ -96,7 +95,8 @@ exports.updateUserValidator = [
 ];
 
 exports.changeUserPasswordValidator = [
-  check("id").isMongoId().withMessage("Invalid User id format"),
+  check("id").optional().isMongoId().withMessage("invalid id formate"),
+
   body("currentPassword")
     .notEmpty()
     .withMessage("You must enter your current password"),
@@ -107,8 +107,13 @@ exports.changeUserPasswordValidator = [
     .notEmpty()
     .withMessage("You must enter new password")
     .custom(async (val, { req }) => {
+      if (req.params.id) {
+        console.log(req.params.id);
+        req.user._id = req.params.id;
+        console.log(req.user._id);
+      }
       // 1) Verify current password
-      const user = await User.findById(req.params.id);
+      const user = await User.findById(req.user._id);
       if (!user) {
         throw new Error("There is no user for this id");
       }

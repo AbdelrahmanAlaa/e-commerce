@@ -31,9 +31,15 @@ exports.protect = asyncHandler(async (req, res, next) => {
       .json({ message: "access denied , no token provided" });
   }
   // verify token (no change happen or expired )
-  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  } catch (err) {
+    return res.status(401).json({ message: "invalid token or expired" });
+  }
 
   // check if user exists
+
   const checkUser = await User.findById(decoded._id);
 
   if (!checkUser) {
@@ -48,7 +54,8 @@ exports.protect = asyncHandler(async (req, res, next) => {
       checkUser.passwordChangedAt.getTime() / 1000,
       10
     );
-    if (passChangeTime > checkUser.passwordChangedAt) {
+
+    if (passChangeTime > decoded.iat) {
       return next(
         new ApiError(
           "This Email changed his password , please login again ",
@@ -63,7 +70,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
   next();
 });
 
-exports.register = asyncHandler(async (req, res, next) => {
+exports.register = asyncHandler(async (req, res) => {
   const user = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -101,7 +108,6 @@ exports.login = asyncHandler(async (req, res, next) => {
 
 exports.allowedTo = (...roles) =>
   asyncHandler(async (req, res, next) => {
-    console.log(req.user.name);
     if (!roles.includes(req.user.role)) {
       return next(
         new ApiError("you are not allowed to access this route .. ", 403)
@@ -180,26 +186,6 @@ exports.restPassword = asyncHandler(async (req, res) => {
   res.status(200).json({
     status: "success",
     message: "successfully updated your password",
-    user,
-  });
-});
-
-exports.getAllUsers = asyncHandler(async (req, res) => {
-  const user = await User.find();
-  res.status(200).json({
-    status: "true",
-    user,
-  });
-});
-exports.getUserById = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
-  if (!user)
-    res.status(404).json({
-      status: "false",
-      message: "this user is not found ... ",
-    });
-  res.status(200).json({
-    status: "true",
     user,
   });
 });

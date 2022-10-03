@@ -13,7 +13,8 @@ exports.deleteOne = (Model) =>
       return res
         .status(404)
         .json({ status: "false ", message: "this id is not found .." });
-
+    // trigger "remove" event when update document
+    documents.remove();
     res.status(200).json({ message: "successfully deleted .. " });
   });
 
@@ -26,7 +27,9 @@ exports.update = (Model) =>
       return res
         .status(404)
         .json({ status: "false ", message: "this id is not found .." });
+    // trigger "update" event when update document look in review models in 64
 
+    documents.save();
     res.status(200).json({ status: "true", documents });
   });
 
@@ -36,9 +39,16 @@ exports.createOne = (Model) =>
     res.status(200).json({ message: "true", documents });
   });
 
-exports.getOne = (Model) =>
+exports.getOne = (Model, populateOpt) =>
   asyncHandler(async (req, res) => {
-    const documents = await Model.find({ _id: req.params.id });
+    // build query
+    let query = Model.find({ _id: req.params.id });
+    if (populateOpt) {
+      console.log(populateOpt);
+      query = query.populate(populateOpt);
+    }
+    // execute query
+    const documents = await query;
     if (!documents)
       return res.status(400).json({
         status: "false",
@@ -53,8 +63,13 @@ exports.getOne = (Model) =>
 exports.getAll = (Model, modelName) =>
   asyncHandler(async (req, res) => {
     // Build Query
+    let filter = {};
+    if (req.filterObj) {
+      filter = req.filterObj;
+    }
+    console.log(filter);
     const contDocuments = await Model.countDocuments();
-    const apiFeatures = new ApiFeatures(req.query, Model.find())
+    const apiFeatures = new ApiFeatures(req.query, Model.find(filter))
       .sort()
       .paginate(contDocuments)
       .limitFields()

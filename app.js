@@ -9,9 +9,14 @@ const subCategory = require("./routes/subCategoryRoutes");
 const category = require("./routes/categoryRoutes");
 const brand = require("./routes/brandRoutes");
 const product = require("./routes/productRoutes");
+const review = require("./routes/reviewRoutes");
+const wishList = require("./routes/wishListRoutes");
+const address = require("./routes/addressRoutes");
 
 const express = require("express");
+
 const app = express();
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static("images"));
@@ -25,6 +30,9 @@ app.use("/api/subCategory", subCategory);
 app.use("/api/category", category);
 app.use("/api/brands", brand);
 app.use("/api/products", product);
+app.use("/api/review", review);
+app.use("/api/wishList", wishList);
+app.use("/api/address", address);
 
 app.all("*", (req, res, next) => {
   const err = new Error(`can't find this route ${req.originalUrl}`);

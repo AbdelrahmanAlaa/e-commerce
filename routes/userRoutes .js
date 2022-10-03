@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const {
+  updateLoggedUserPassword,
+  getLoggedUserData,
+  updateLoggedUser,
   createUser,
   deleteUser,
   getUser,
@@ -19,6 +22,15 @@ const {
 } = require("../utils/validation/validationUser");
 
 const { protect, allowedTo } = require("../controller/authUsersController");
+
+router.get("/getMe", protect, getLoggedUserData, getUserById);
+router.patch("/updateMe", protect, updateUserValidator, updateLoggedUser);
+router.patch(
+  "/changeMyPassword",
+  protect,
+  changeUserPasswordValidator,
+  updateLoggedUserPassword
+);
 
 router
   .route("/")
@@ -44,9 +56,11 @@ router
     updateUser
   );
 
-router
-  .route("/changePassword/:id")
-  .patch(changeUserPasswordValidator, updateUserPassword);
+router.patch(
+  "/changePassword/:id",
+  protect,
+  changeUserPasswordValidator,
+  updateUserPassword
+);
 
-// router.use("/:UserId/subUser", UserRoutes);
 module.exports = router;
